@@ -88,6 +88,36 @@ h2.sec-title{font-family:var(--serif);font-weight:500;font-size:clamp(24px,3.4vw
 }
 .todo::before{content:"オーナー確認";flex-shrink:0;font-weight:500;font-size:11px;letter-spacing:.18em;color:#fff;background:#c49a3f;border-radius:4px;padding:2px 8px;transform:translateY(-1px)}
 
+/* ============ 日本語折り返し制御 ============ */
+/* 分割禁止ユニット（マシン名・金額など） */
+.nb{white-space:nowrap}
+/* 見出し系は行長を揃えて折り返す（1〜2文字のぶら下がり防止） */
+h1,h2.sec-title,.story-copy h3,.menu-title,.compare-title,.compare-col h4,
+.offer-title,.worries-close,.reserve h2,.promise h3{text-wrap:balance}
+/* 本文は最終行の孤立文字を避ける */
+p,li,dd,.todo{text-wrap:pretty}
+/* 短文の表示要素は文節単位で折り返す（対応ブラウザのみ・他は従来どおり）
+   ※ auto-phrase は文節を min-content の不可分単位として扱うため、
+     1fr グリッド内の要素（menu-title 等）には使わず keep-all + wbr で制御する */
+h1,h2.sec-title,.sec-sub,.story-copy h3,.story-role,.menu-lead,
+.compare-title,.compare-col h4,.offer-title,.offer-cat,.cat-sub,.offer-after,.offer-since,
+.promise h3,.flow-step h3,.menu-note,.reserve .lead{word-break:auto-phrase}
+/* メニュー名は語句（nb・wbr・括弧）の位置でのみ折り返す */
+.menu-title{word-break:keep-all}
+.menu-sub-grid .menu-sub{min-width:0}
+/* CTAボタンの文言は語句単位で折り返す */
+.cta-bar,.btn-line{word-break:keep-all}
+/* 読点・wbr の位置でのみ折り返す要素（wbr は本文側に配置） */
+.worries-list li,.worries-close{word-break:keep-all}
+/* FAQ設問: flex 直下の匿名ボックスを避けるため .q で明示的に包む */
+.faq-list summary .q{flex:1;min-width:0;word-break:keep-all}
+/* チップ内では折り返さない（チップ単位で折り返す） */
+.chip{white-space:nowrap}
+/* 金額の数字と「円」を離さない */
+table.price td.p{word-break:keep-all}
+/* ※注記は1文単位で折り返す */
+.menu-note .n{display:inline-block}
+
 /* ============ header ============ */
 header{
   position:absolute;top:0;left:0;right:0;z-index:20;
@@ -234,9 +264,10 @@ header nav a:hover::after{width:100%}
 /* ============ メニュー・料金 ============ */
 .menu-group + .menu-group{margin-top:64px}
 .menu-group-title{
-  display:flex;align-items:baseline;gap:14px;
+  display:flex;align-items:baseline;gap:2px 14px;flex-wrap:wrap;
   font-family:var(--serif);font-weight:500;font-size:20px;letter-spacing:.16em;
   margin-bottom:22px;
+  word-break:keep-all;  /* 和名は折り返さず、英字ラベルごと次行へ */
 }
 .menu-group-title .en{font-family:var(--sans);font-weight:400;font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:#8d8677}
 .menu-group-title::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--lime);border-width:1px;border-style:solid;border-color:#c9d68f;transform:translateY(-1px)}
@@ -308,6 +339,18 @@ table.price td.p small,.p-note{font-size:11px;color:#8d8677}
   table.price th{font-size:10.5px;letter-spacing:.06em}
   table.price th,table.price td{padding:11px 5px}
   table.price td.p{font-size:13px}
+  /* 4列の料金表: コース名を全幅の行見出しにして金額3列分の幅を確保 */
+  table.price.cols4,table.price.cols4 thead,table.price.cols4 tbody{display:block}
+  table.price.cols4 tr{display:grid;grid-template-columns:repeat(3,1fr)}
+  table.price.cols4 th:first-child{display:none}
+  table.price.cols4 th,table.price.cols4 td{padding:11px 8px 11px 0}
+  table.price.cols4 td:first-child{
+    grid-column:1/-1;border-bottom-style:none;
+    padding:15px 0 2px;font-weight:400;letter-spacing:.1em;
+  }
+}
+@media(max-width:400px){
+  .menu-title{font-size:19px}  /* <span class="nb">《ボディスカルプト》</span>を折り返さず1行に収める */
 }
 
 /* ============ 初回体験オファー ============ */
@@ -559,17 +602,17 @@ html.js .reveal.in{opacity:1;transform:none}
   <div class="wrap">
     <div class="sec-head reveal" style="text-align:center">
       <div class="eyebrow" style="justify-content:center"><span class="en">Check</span><span class="dash"></span></div>
-      <h2 class="sec-title" id="worries-title">こんな思い、ありませんか。</h2>
+      <h2 class="sec-title" id="worries-title"><span class="nb">こんな思い、</span><span class="nb">ありませんか。</span></h2>
     </div>
     <ul class="worries-list reveal">
-      <li>鏡の前で、ボディラインやフェイスラインがなんとなく気になる</li>
-      <li>運動やジム通いは、続けられる自信がない</li>
-      <li>肩や背中が、いつも重たい気がする</li>
-      <li>夕方になると、脚がだるくなってくる</li>
-      <li>育児や仕事で、自分の時間はいつもあとまわし</li>
-      <li>サロンの勧誘や、他のお客さまの目が気になる</li>
+      <li>鏡の前で、ボディラインや<wbr>フェイスラインが<wbr>なんとなく気になる</li>
+      <li>運動やジム通いは、続けられる<wbr>自信がない</li>
+      <li>肩や背中が、いつも重たい<wbr>気がする</li>
+      <li>夕方になると、脚がだるく<wbr>なってくる</li>
+      <li>育児や仕事で、自分の時間は<wbr>いつもあとまわし</li>
+      <li>サロンの勧誘や、他のお客さまの目が<wbr>気になる</li>
     </ul>
-    <p class="worries-close reveal">そのお気持ちのまま、どうぞ。<br>amaneco は予約枠をおひとりずつ区切った、気がねなく過ごせるサロンです。</p>
+    <p class="worries-close reveal">そのお気持ちのまま、どうぞ。<br>amaneco は予約枠を<wbr>おひとりずつ区切った、気がねなく過ごせる<wbr>サロンです。</p>
   </div>
 </section>
 
@@ -621,7 +664,7 @@ html.js .reveal.in{opacity:1;transform:none}
       <div class="story-copy">
         <p class="story-role">Machine Care — マシンで、からだもお顔も</p>
         <h3>寝たまま、着たまま。<br>30分のマシンケア。</h3>
-        <p>電磁パルスマシン《ボディスカルプト》が、横になったままのからだにトレーニングのような刺激を届けます。お洋服のまま受けられるから、お仕事帰りにも、家事のあいまにも。運動が苦手な方の、続けやすいボディメイクのお手伝いです。フェイスラインをすっきり見せたい方には、超音波フェイシャル《アイスナイフ》もご用意しています。</p>
+        <p>電磁パルスマシン<span class="nb">《ボディスカルプト》</span>が、横になったままのからだにトレーニングのような刺激を届けます。お洋服のまま受けられるから、お仕事帰りにも、家事のあいまにも。運動が苦手な方の、続けやすいボディメイクのお手伝いです。フェイスラインをすっきり見せたい方には、超音波フェイシャル<span class="nb">《アイスナイフ》</span>もご用意しています。</p>
         <div class="chips">
           <span class="chip">寝たまま30分</span>
           <span class="chip">着たままOK</span>
@@ -662,13 +705,13 @@ html.js .reveal.in{opacity:1;transform:none}
       <h3 class="menu-group-title">痩身エステ<span class="en">Slimming</span></h3>
       <div class="menu-main">
         <p class="menu-lead">寝たまま30分のマシンケア</p>
-        <h4 class="menu-title">電磁パルス痩身《ボディスカルプト》</h4>
+        <h4 class="menu-title">電磁パルス痩身<span class="nb">《ボディスカルプト》</span></h4>
         <div class="chips">
           <span class="chip">寝たまま30分〜</span>
           <span class="chip">着たままOK</span>
           <span class="chip">広い範囲をまとめてケア</span>
         </div>
-        <table class="price">
+        <table class="price cols4">
           <thead><tr><th scope="col">コース</th><th scope="col">都度</th><th scope="col">定額 4回</th><th scope="col">定額 8回</th></tr></thead>
           <tbody>
             <tr>
@@ -685,12 +728,12 @@ html.js .reveal.in{opacity:1;transform:none}
             </tr>
           </tbody>
         </table>
-        <p class="menu-note">※定額プランは初回施術日より1ヶ月有効です。※メンズは +20%です。</p>
+        <p class="menu-note"><span class="n">※定額プランは初回施術日より1ヶ月有効です。</span><span class="n">※メンズは +20%です。</span></p>
       </div>
       <div class="menu-sub-grid" style="margin-top:26px">
         <div class="menu-sub">
           <p class="menu-lead">気になる部位の超音波集中ケア</p>
-          <h4 class="menu-title">超音波集中ボディケア《アイスナイフ》</h4>
+          <h4 class="menu-title">超音波集中ボディケア<span class="nb">《アイスナイフ》</span></h4>
           <div class="chips"><span class="chip">1部位・30分</span><span class="chip">気になる部位にピンポイント</span></div>
           <table class="price">
             <tbody>
@@ -709,7 +752,7 @@ html.js .reveal.in{opacity:1;transform:none}
               <tr><td>6回プラン</td><td class="p">13,200<small>円</small><br><span class="p-note">（2ヶ月有効）</span></td></tr>
             </tbody>
           </table>
-          <p class="menu-note">※はじめての方のお試し 2,000円。※メンズは +20%です。</p>
+          <p class="menu-note"><span class="n">※はじめての方のお試し 2,000円。</span><span class="n">※メンズは +20%です。</span></p>
         </div>
       </div>
     </div>
@@ -719,7 +762,7 @@ html.js .reveal.in{opacity:1;transform:none}
       <div class="menu-sub-grid">
         <div class="menu-sub">
           <p class="menu-lead">フェイスラインをすっきり見せる超音波ケア</p>
-          <h4 class="menu-title">超音波フェイシャル《アイスナイフ》</h4>
+          <h4 class="menu-title">超音波フェイシャル<span class="nb">《アイスナイフ》</span></h4>
           <div class="chips">
             <span class="chip">30分</span>
             <span class="chip">痩身・リラクと同日OK</span>
@@ -729,11 +772,11 @@ html.js .reveal.in{opacity:1;transform:none}
               <tr><td>30分</td><td class="p">5,500<small>円</small></td></tr>
             </tbody>
           </table>
-          <p class="menu-note">※お顔まわりの集中ケアです。※メンズは +20%です。</p>
+          <p class="menu-note"><span class="n">※お顔まわりの集中ケアです。</span><span class="n">※メンズは +20%です。</span></p>
         </div>
         <div class="menu-sub">
           <p class="menu-lead">ととのえたあとは、手のひらでゆるめて</p>
-          <h4 class="menu-title">フェイシャル＆ドライヘッドスパ セット</h4>
+          <h4 class="menu-title"><span class="nb">フェイシャル＆</span><span class="nb">ドライヘッドスパ</span> セット</h4>
           <div class="chips">
             <span class="chip">60分</span>
             <span class="chip">超音波30分＋ハンドケア30分</span>
@@ -743,22 +786,22 @@ html.js .reveal.in{opacity:1;transform:none}
               <tr><td>60分</td><td class="p">8,250<small>円</small></td></tr>
             </tbody>
           </table>
-          <p class="menu-note">※超音波フェイシャルのあと、デコルテ・首肩・ドライヘッドスパでそのままうとうとできる60分です。※メンズは +20%です。</p>
+          <p class="menu-note"><span class="n">※超音波フェイシャルのあと、デコルテ・首肩・ドライヘッドスパでそのままうとうとできる60分です。</span><span class="n">※メンズは +20%です。</span></p>
         </div>
       </div>
     </div>
 
     <div class="compare reveal">
-      <p class="compare-title">《ボディスカルプト》と《アイスナイフ》、どう違う？</p>
+      <p class="compare-title"><span class="nb">《ボディスカルプト》</span>と<span class="nb">《アイスナイフ》</span>、どう違う？</p>
       <div class="compare-grid">
         <div class="compare-col">
           <p class="compare-tag">動かすマシン</p>
-          <h4>電磁パルス痩身《ボディスカルプト》</h4>
+          <h4>電磁パルス痩身<span class="nb">《ボディスカルプト》</span></h4>
           <p>電磁パルスが、寝たままのからだにトレーニングのような刺激を届けるマシン。前面・背面といった広い範囲をまとめてケアします。運動が苦手な方の、続けやすいボディメイクに。</p>
         </div>
         <div class="compare-col">
           <p class="compare-tag">狙うマシン</p>
-          <h4>超音波《アイスナイフ》</h4>
+          <h4>超音波<span class="nb">《アイスナイフ》</span></h4>
           <p>超音波を気になる部位にピンポイントで当てる集中ケアのマシン。フェイスラインやお腹まわりなど、部分的に集中してケアしたいところに。フェイスもボディも、1部位・30分です。</p>
         </div>
       </div>
@@ -779,11 +822,11 @@ html.js .reveal.in{opacity:1;transform:none}
               <tr><td>120分</td><td class="p">9,600<small>円</small></td></tr>
             </tbody>
           </table>
-          <p class="menu-note">※メンズは 60分ごとに +1,000円です。</p>
+          <p class="menu-note">※メンズは 60分ごとに <span class="nb">+1,000円</span>です。</p>
         </div>
         <div class="menu-sub">
           <p class="menu-lead">香りとともに、ゆったりと</p>
-          <h4 class="menu-title">アロマオイルトリートメント</h4>
+          <h4 class="menu-title">アロマオイル<wbr>トリートメント</h4>
           <div class="chips"><span class="chip">オイル使用</span><span class="chip">同日の組み合わせOK</span></div>
           <table class="price">
             <tbody>
@@ -792,7 +835,7 @@ html.js .reveal.in{opacity:1;transform:none}
               <tr><td>120分</td><td class="p">13,200<small>円</small></td></tr>
             </tbody>
           </table>
-          <p class="menu-note">※メンズは 60分ごとに +1,000円です。</p>
+          <p class="menu-note">※メンズは 60分ごとに <span class="nb">+1,000円</span>です。</p>
         </div>
       </div>
     </div>
@@ -810,13 +853,13 @@ html.js .reveal.in{opacity:1;transform:none}
     <div class="offer-card reveal">
       <img class="neco-anchor" src="data:image/png;base64,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" alt="">
       <p class="offer-label">First Visit</p>
-      <h2 class="offer-title" id="offer-title">はじめての方へ、初回体験。</h2>
+      <h2 class="offer-title" id="offer-title">はじめての方へ、<span class="nb">初回体験。</span></h2>
       <div class="offer-groups">
         <div class="offer-group offer-group-wide">
           <p class="offer-cat">痩身エステ</p>
           <div class="offer-duo">
             <div class="offer-item">
-              <p class="cat-sub">電磁パルス痩身<br>《ボディスカルプト》</p>
+              <p class="cat-sub">電磁パルス痩身<br><span class="nb">《ボディスカルプト》</span></p>
               <div class="offer-price-row">
                 <p class="offer-price"><span class="len">30分</span><span class="num">3,300<small>円</small></span></p>
                 <p class="offer-price"><span class="len">60分</span><span class="num">5,500<small>円</small></span></p>
@@ -824,7 +867,7 @@ html.js .reveal.in{opacity:1;transform:none}
               <p class="offer-after">2回目以降は 30分 4,950円。<br>続けたい方には定額プランも。</p>
             </div>
             <div class="offer-item">
-              <p class="cat-sub">超音波集中ボディケア<br>《アイスナイフ》</p>
+              <p class="cat-sub">超音波集中ボディケア<br><span class="nb">《アイスナイフ》</span></p>
               <div class="offer-price-row">
                 <p class="offer-price"><span class="len">1部位・30分</span><span class="num">3,300<small>円</small></span></p>
               </div>
@@ -834,7 +877,7 @@ html.js .reveal.in{opacity:1;transform:none}
         </div>
         <div class="offer-group">
           <p class="offer-cat">フェイシャル</p>
-          <p class="cat-sub">超音波フェイシャル<br>《アイスナイフ》</p>
+          <p class="cat-sub">超音波フェイシャル<br><span class="nb">《アイスナイフ》</span></p>
           <div class="offer-price-row">
             <p class="offer-price"><span class="len">30分</span><span class="num">3,300<small>円</small></span></p>
           </div>
@@ -842,7 +885,7 @@ html.js .reveal.in{opacity:1;transform:none}
         </div>
       </div>
       <p class="offer-since">価格はすべて税込・カウンセリング込み。勧誘はいたしません。</p>
-      <a class="cta-bar" href="https://lin.ee/OFAwBJe" target="_blank" rel="noopener">初回体験を LINE で予約する<span class="arrow">⟶</span></a>
+      <a class="cta-bar" href="https://lin.ee/OFAwBJe" target="_blank" rel="noopener"><span>初回体験を <span class="nb">LINE で予約する</span></span><span class="arrow">⟶</span></a>
     </div>
   </div>
 </section>
@@ -954,31 +997,31 @@ html.js .reveal.in{opacity:1;transform:none}
     </div>
     <div class="faq-list reveal">
       <details>
-        <summary>勧誘はありますか？</summary>
+        <summary><span class="q">勧誘はありますか？</span></summary>
         <p>いたしません。メニューやご来店のペースは、ご自身で決めていただくのがいちばんだと考えています。「今日は相談だけ」も歓迎です。</p>
       </details>
       <details>
-        <summary>何を持っていけばいいですか？</summary>
+        <summary><span class="q">何を持っていけば<wbr>いいですか？</span></summary>
         <p>手ぶらでどうぞ。マシンケアやもみほぐしはお洋服のまま受けられます。お着替えが必要なメニューはこちらでご用意しています。</p>
       </details>
       <details>
-        <summary>《ボディスカルプト》と《アイスナイフ》は何が違いますか？</summary>
-        <p>アプローチの仕方が違います。《ボディスカルプト》は電磁パルスでからだにトレーニングのような刺激を届ける「動かす」マシンで、前面・背面など広い範囲をまとめてケアします。《アイスナイフ》は超音波を気になる部位にピンポイントで当てる「狙う」マシンで、フェイスラインや部分的なケアが得意です。どちらが合うかはカウンセリングでご提案しますので、迷ったら「相談だけ」でもお気軽にどうぞ。</p>
+        <summary><span class="q"><span class="nb">《ボディスカルプト》</span>と<span class="nb">《アイスナイフ》</span>は<wbr>何が違いますか？</span></summary>
+        <p>アプローチの仕方が違います。<span class="nb">《ボディスカルプト》</span>は電磁パルスでからだにトレーニングのような刺激を届ける「動かす」マシンで、前面・背面など広い範囲をまとめてケアします。<span class="nb">《アイスナイフ》</span>は超音波を気になる部位にピンポイントで当てる「狙う」マシンで、フェイスラインや部分的なケアが得意です。どちらが合うかはカウンセリングでご提案しますので、迷ったら「相談だけ」でもお気軽にどうぞ。</p>
       </details>
       <details>
-        <summary>他のお客さまと会うことはありますか？</summary>
+        <summary><span class="q">他のお客さまと<wbr>会うことは<wbr>ありますか？</span></summary>
         <p>ありません。完全予約制で予約枠をおひとりずつ区切っているため、ご来店からお帰りまで他のお客さまと顔を合わせることはありません。</p>
       </details>
       <details>
-        <summary>子ども連れでも大丈夫ですか？</summary>
+        <summary><span class="q">子ども連れでも<wbr>大丈夫ですか？</span></summary>
         <p>はい、お子さま同伴OKです。ご予約の際にひとことお知らせください。</p>
       </details>
       <details>
-        <summary>男性も利用できますか？</summary>
-        <p>はい、ご利用いただけます。料金はマシンメニュー（痩身・フェイシャル）が +20%、リラクゼーションが 60分ごとに +1,000円です。まずは LINE でお気軽にご相談ください。</p>
+        <summary><span class="q">男性も利用できますか？</span></summary>
+        <p>はい、ご利用いただけます。料金はマシンメニュー（痩身・フェイシャル）が +20%、リラクゼーションが 60分ごとに <span class="nb">+1,000円</span>です。まずは LINE でお気軽にご相談ください。</p>
       </details>
       <details>
-        <summary>予約のキャンセルはできますか？</summary>
+        <summary><span class="q">予約のキャンセルは<wbr>できますか？</span></summary>
         <p>ご予約日の2日前までに、LINE またはお電話でご連絡ください。日時の変更もお気軽にどうぞ。</p>
       </details>
     </div>
@@ -989,7 +1032,7 @@ html.js .reveal.in{opacity:1;transform:none}
 <section class="reserve" id="reserve" aria-labelledby="reserve-title">
   <div class="wrap">
     <p class="en-label reveal">Reservation</p>
-    <h2 id="reserve-title" class="reveal">まずは LINE で、お気軽に。</h2>
+    <h2 id="reserve-title" class="reveal">まずは <span class="nb">LINE で、</span><span class="nb">お気軽に。</span></h2>
     <p class="lead reveal">空き状況の確認も、メニュー選びの相談も、LINE のメッセージひとつで。オーナーがひとつずつお返事します。初回は、お名前と気になるところをうかがってから日時を確定します。</p>
     <div class="reserve-grid reveal">
       <div class="qr-card">
